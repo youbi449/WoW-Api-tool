@@ -1,6 +1,4 @@
-local youbi = {}
-
-function youbi.AoeHeal(limit, number)
+function AoeHeal(limit, number)
     local aoe = 0
     if math.floor((UnitHealth("player") / UnitHealthMax("player")) * 100) <= limit then
         aoe = aoe + 1
@@ -22,7 +20,7 @@ function youbi.AoeHeal(limit, number)
     end
 end
 
-function youbi.Buff(buff, unit)
+function Buff(buff, unit)
     for i = 1, 40 do
         name, icon, count, debuffType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId,
             canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod =
@@ -34,8 +32,22 @@ function youbi.Buff(buff, unit)
     return false
 end
 
-function youbi.minHp(unitHp, minHp)
+function minHp(unitHp, minHp)
     return unitHp <= minHp
 end
 
-return youbi
+function PartyMemberHaveBuff(buff)
+    if (IsInGroup()) then
+        for i = 1, 40 do
+            if Buff(buff, "party" .. i) then
+                return true
+            end
+        end
+        return false
+    else
+        if Buff(buff, 'player') then
+            return true
+        end
+        return false
+    end
+end
