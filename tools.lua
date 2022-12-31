@@ -1,4 +1,4 @@
-function AoeHeal(limit, number)
+function AoeHeal(limit, number, spell)
     local aoe = 0
     if math.floor((UnitHealth("player") / UnitHealthMax("player")) * 100) <= limit then
         aoe = aoe + 1
@@ -13,7 +13,7 @@ function AoeHeal(limit, number)
             end
         end
     end
-    if aoe >= number then
+    if aoe >= number and IsSpellKnown(spell) then
         return true
     else
         return false
@@ -32,8 +32,8 @@ function Buff(buff, unit)
     return false
 end
 
-function minHp(unitHp, minHp)
-    return unitHp <= minHp
+function heal(unitHp, minHp, spell)
+    return unitHp <= minHp and IsSpellKnown(spell)
 end
 
 function PartyMemberHaveBuff(buff)
