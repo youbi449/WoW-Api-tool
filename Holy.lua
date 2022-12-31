@@ -14,12 +14,19 @@ local S = {
     HolyFire = 14914,
     ShadowWordDeath = 32379,
     PowerInfusion = 10060,
+    Sanctification = 34861,
     PriereDuDesespoir = 19236,
     SoinRapide = 2061,
     PriereDeGuerison = 33076,
     PriereDeGuerisonBuff = 41635,
     Renovation = 139,
+    PriereDeSoins = 596,
+    EspritGardien = 47788,
+    Soin = 2060,
     Serenite = 2050,
+    JaillitTenebreBuff = 390617,
+    JaillitTenebre = 390615,
+    HymneDivin = 64843
 };
 
 local CN = {
@@ -107,9 +114,23 @@ function Priest:Holy()
     MaxDps:GlowEssences();
 
 
+    --[[ DEFENSIVE PRIEST  ]]
+    if cooldown[S.PriereDuDesespoir].ready and minHp(selfHealthMax, 25) then
+        return IsSpellKnown(S.PriereDuDesespoir) and S.PriereDuDesespoir
+    end
 
+    --[[ handle AOE Healing ]]
+    if AoeHeal(40, 4) and cooldown[S.HymneDivin].ready then
+        return IsSpellKnown(S.HymneDivin) and S.HymneDivin
+    end
+    if AoeHeal(60, 3) and cooldown[S.Sanctification].ready then
+        return IsSpellKnown(S.Sanctification) and S.Sanctification
+    end
+    if AoeHeal(75, 3) then
+        return IsSpellKnown(S.PriereDeSoins) and S.PriereDeSoins
+    end
 
-    if UnitIsEnemy('player', 'target') then
+    if UnitCanAttack('player', 'target') then
         if (not UnitIsDead('player')) then
             return Priest:selfHeal()
         end
@@ -121,43 +142,59 @@ function Priest:Holy()
 
 end
 
-function Priest:AoeHealing()
-    --[[ handle AOE Healing ]]
-end
-
 function Priest:TargetHeal()
+
+    if minHp(healthPercent, 15) and cooldown[S.EspritGardien].ready then
+        return IsSpellKnown(S.EspritGardien) and S.EspritGardien;
+    end
     if minHp(healthPercent, 35) and cooldown[S.Serenite].ready then
         return IsSpellKnown(S.Serenite) and S.Serenite;
     end
     if minHp(healthPercent, 50) then
         return IsSpellKnown(S.SoinRapide) and S.SoinRapide;
     end
-    if not PartyMemberHaveBuff(S.Renovation) and minHp(healthPercent, 90) then
+    if minHp(healthPercent, 75) and talents[S.JaillitTenebre] and buff[S.JaillitTenebreBuff].count > 45 then
+        return IsSpellKnown(S.SoinRapide) and S.SoinRapide
+    end
+    if minHp(healthPercent, 75) then
+        return IsSpellKnown(S.Soin) and S.Soin;
+    end
+    if not Buff(S.Renovation, 'target') and minHp(healthPercent, 90) then
         return IsSpellKnown(S.Renovation) and S.Renovation
     end
-    if not PartyMemberHaveBuff(S.PriereDeGuerisonBuff) and minHp(healthPercent, 99) and cooldown[S.PriereDeGuerison].ready then
+    if not PartyMemberHaveBuff(S.PriereDeGuerisonBuff) and minHp(healthPercent, 99) and
+        cooldown[S.PriereDeGuerison].ready then
         return IsSpellKnown(S.PriereDeGuerison) and S.PriereDeGuerison
     end
 end
 
 function Priest:selfHeal()
-    Priest:Defensive()
+
+    if minHp(selfHealthPercent, 15) and cooldown[S.EspritGardien].ready then
+        return IsSpellKnown(S.EspritGardien) and S.EspritGardien;
+    end
+
     if minHp(selfHealthPercent, 35) and cooldown[S.Serenite].ready then
         return IsSpellKnown(S.Serenite) and S.Serenite;
     end
     if minHp(selfHealthPercent, 50) then
         return IsSpellKnown(S.SoinRapide) and S.SoinRapide;
     end
-    if not PartyMemberHaveBuff(S.Renovation) and minHp(selfHealthPercent, 90) then
+    if minHp(selfHealthPercent, 75) and talents[S.JaillitTenebre] and buff[S.JaillitTenebreBuff].count > 45 then
+        return IsSpellKnown(S.SoinRapide) and S.SoinRapide
+    end
+    if minHp(selfHealthPercent, 75) then
+        return IsSpellKnown(S.Soin) and S.Soin;
+    end
+    if not Buff(S.Renovation, 'player') and minHp(selfHealthPercent, 90) then
         return IsSpellKnown(S.Renovation) and S.Renovation
     end
-    if not PartyMemberHaveBuff(S.PriereDeGuerisonBuff) and minHp(selfHealthPercent, 99) and cooldown[S.PriereDeGuerison].ready then
+    if not PartyMemberHaveBuff(S.PriereDeGuerisonBuff) and minHp(selfHealthPercent, 99) and
+        cooldown[S.PriereDeGuerison].ready then
         return IsSpellKnown(S.PriereDeGuerison) and S.PriereDeGuerison
     end
 end
 
 function Priest:Defensive()
-    if cooldown[S.PriereDuDesespoir].up and minHp(selfHealthMax, 25) then
-        return IsSpellKnown(S.PriereDuDesespoir) and S.PriereDuDesespoir
-    end
+
 end
